@@ -1,29 +1,23 @@
-
-# Use Node.js LTS
-FROM node:20-alpine
-
-# Install git and any build tools needed
-RUN apk add --no-cache git
-
-# Set working directory
+# Use Node 20 Alpine for a lightweight base
+FROM node:20-alpine AS base
 WORKDIR /app
 
-# Copy dependencies
+# Copy and install dependencies (common for both dev and prod)
 COPY package*.json ./
-
-# Install dependencies based on NODE_ENV
-ARG NODE_ENV=production
 RUN npm install
 
-# Copy source code
+# Copy source
 COPY . .
 
-# Build Next.js only for production
-RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
-
-# Expose port
+# ========== Development ==========
+FROM base AS dev
+ENV NODE_ENV=development
 EXPOSE 4000
+CMD ["npm", "run", "dev"]
 
-# Run command depending on environment
-CMD if [ "$NODE_ENV" = "production" ]; then npm start; else npm run dev -- -H 0.0.0.0; fi
-
+# ========== Production ==========
+FROM base AS prod
+ENV NODE_ENV=production
+RUN npm run build
+EXPOSE 4000
+CMD ["npm", "start"]

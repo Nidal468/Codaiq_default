@@ -1,0 +1,21 @@
+services:
+  codaiq:
+    container_name: ${ID:-error}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ${MODE:-dev} # "dev" or "prod"
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=${MODE:-development}
+    networks:
+      - codaiq-network
+    restart: unless-stopped
+
+networks:
+  codaiq-network:
+    external: true
