@@ -5,8 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: ${MODE:-dev} # "dev" or "prod"
-    ports:
-      - "4000:4000"
+      
     volumes:
       - .:/app
       - /app/node_modules
